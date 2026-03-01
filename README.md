@@ -3,7 +3,7 @@ An Edge-AI driven dynamic Electric Power Steering (EPS) controller using an expl
 
 # Edge-AI Dynamic EPS Controller for Automotive ADAS
 
-[![AMD Slingshot](https://img.shields.io/badge/AMD_Slingshot-Hackathon_2026-black)](#)
+[![AMD Slingshot](https://img.shields.io/badge/AMD_Slingshot_Hackathon_2026-black)](#)
 [![Theme](https://img.shields.io/badge/Theme-Smart_Cities-blue)](#)
 [![Hardware](https://img.shields.io/badge/Hardware-Kria_KV260-red)](#)
 [![AI](https://img.shields.io/badge/AI-Explainable_ANFIS-purple)](#)
