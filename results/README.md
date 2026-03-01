@@ -3,7 +3,7 @@
 This directory contains the visual artifacts and analytical graphs generated during the training and validation of the Deep ANFIS model.
 
 ## Contents
-- **Analysis Images (`.png` / `.jpg`):** Visual plots demonstrating model convergence, training loss, and PI gain dynamics.
+- **Analysis Images (`.png` / `.jpeg`):** Visual plots demonstrating model convergence, training loss, and PI gain dynamics.
 
 ## Interpretation of Results
 Traditional neural networks are "Black Boxes" which fail ISO 26262 automotive safety standards. The analysis images provided here demonstrate **Explainable AI (XAI)**.
