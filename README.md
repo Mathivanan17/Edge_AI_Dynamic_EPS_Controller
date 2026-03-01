@@ -3,10 +3,10 @@ An Edge-AI driven dynamic Electric Power Steering (EPS) controller using an expl
 
 # Edge-AI Dynamic EPS Controller for Automotive ADAS
 
-[![AMD Slingshot](https://img.shields.io/badge/AMD_Slingshot-Hackathon_2026-red)](https://www.amd.com/en)
-[![Theme](https://img.shields.io/badge/Theme-Smart_Cities-blue)](https://www.amd.com/en/solutions/embedded/smart-cities.html)
+[![AMD Slingshot](https://img.shields.io/badge/AMD_Slingshot_Hackathon_2026-red)](https://amdslingshot.in/)
+[![Theme](https://img.shields.io/badge/Theme-Smart_Cities-blue)](https://vision.hack2skill.com/event/amdslingshot/dashboard/challenges?utm_source=hack2skill&utm_medium=homepage)
 [![Hardware](https://img.shields.io/badge/Hardware-Kria_KV260-green)](https://www.amd.com/en/products/system-on-modules/kria/k26/kv260-vision-starter-kit.html)
-[![AI](https://img.shields.io/badge/AI-Explainable_ANFIS-purple)](https://en.wikipedia.org/wiki/Adaptive_neuro_fuzzy_inference_system)
+[![AI](https://img.shields.io/badge/AI-Explainable_ANFIS-purple)]
 [![Status](https://img.shields.io/badge/Status-Simulated_&_Edge_Ready-yellow)](#)
 
 ## Introduction
