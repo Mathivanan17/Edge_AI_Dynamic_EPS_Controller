@@ -19,12 +19,12 @@ import itertools
 # 0.5. SETUP GPU ACCELERATION
 # ==========================================
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-print(f"🚀 Hardware Accelerator in use: {device.type.upper()}")
+print(f"Hardware Accelerator in use: {device.type.upper()}")
 
 # ==========================================
 # 1. LOAD AND NORMALIZE DIGITAL TWIN DATASET
 # ==========================================
-print("📊 Loading and Normalizing Industrial Sensor Dataset...")
+print("Loading and Normalizing Industrial Sensor Dataset...")
 df = pd.read_csv('Industrial_Digital_Twin_Dataset_10000.csv')
 
 features = [
@@ -49,7 +49,7 @@ X_tensor = torch.tensor(X_normalized, dtype=torch.float32).to(device)
 y_tensor = torch.tensor(y_raw, dtype=torch.float32).to(device) # Shape: [Batch, 2]
 
 X_train, X_test, y_train, y_test = train_test_split(X_tensor, y_tensor, test_size=0.2, random_state=42)
-print("✅ Data Normalized! Ready for training.")
+print("Data Normalized! Ready for training.")
 
 # ==========================================
 # 2. DEFINE THE MULTI-OUTPUT DEEP ANFIS (Hardware-Friendly)
@@ -82,7 +82,7 @@ class UniversalMultiANFIS(nn.Module):
         means = self.means.unsqueeze(0).expand(batch_size, -1, -1)
         sigmas = self.sigmas.unsqueeze(0).expand(batch_size, -1, -1) + 1e-6
 
-        # 🚨 THE FIX: Replace 'Pow' (**2) with simple Multiplication for ONNX compatibility
+        # THE FIX: Replace 'Pow' (**2) with simple Multiplication for ONNX compatibility
         norm_diff = (x_expanded - means) / sigmas
         mu = torch.exp(-0.5 * (norm_diff * norm_diff))
 
@@ -114,7 +114,7 @@ class UniversalMultiANFIS(nn.Module):
 # ==========================================
 # 3. TRAIN THE UNIFIED MODEL
 # ==========================================
-print("🧠 Initializing Unified 729-Rule Deep ANFIS on GPU...")
+print("Initializing Unified 729-Rule Deep ANFIS on GPU...")
 model = UniversalMultiANFIS(num_inputs=6, num_mfs=3).to(device)
 
 optimizer = optim.Adam(model.parameters(), lr=0.01)
@@ -123,7 +123,7 @@ criterion = nn.MSELoss()
 epochs = 500
 loss_history = []
 
-print("⚙️ Starting Training Loop...")
+print("Starting Training Loop...")
 for epoch in range(epochs):
     model.train()
     optimizer.zero_grad()
@@ -145,9 +145,9 @@ model.eval()
 with torch.no_grad():
     test_preds = model(X_test)
     test_loss = criterion(test_preds, y_test)
-print(f"\n✅ Final Testing Loss (MSE): {test_loss.item():.6f}")
+print(f"\nFinal Testing Loss (MSE): {test_loss.item():.6f}")
 
-print("\n📦 Exporting Unified Model to ONNX format...")
+print("\nExporting Unified Model to ONNX format...")
 # Dummy input for tracing the graph architecture
 dummy_input = torch.randn(1, 6, device=device)
 
@@ -159,4 +159,4 @@ torch.onnx.export(model,
                   input_names=['industrial_sensor_array'],
                   output_names=['optimal_pi_gains'])
 
-print("🎉 Export complete! You can now download 'Universal_ANFIS_Unified.onnx' from the Colab file explorer.")
+print("Export complete! You can now download 'Universal_ANFIS_Unified.onnx' from the Colab file explorer.")
