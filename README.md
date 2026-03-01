@@ -3,11 +3,11 @@ An Edge-AI driven dynamic Electric Power Steering (EPS) controller using an expl
 
 # Edge-AI Dynamic EPS Controller for Automotive ADAS
 
-[![AMD Slingshot](https://img.shields.io/badge/AMD_Slingshot_Hackathon_2026-red)](#)
-[![Theme](https://img.shields.io/badge/Theme-Smart_Cities-blue)](#)
-[![Hardware](https://img.shields.io/badge/Hardware-Kria_KV260-green)](#)
-[![AI](https://img.shields.io/badge/AI-Explainable_ANFIS-purple)](#)
-[![Status](https://img.shields.io/badge/Status-Simulated_&_Edge_Ready-yellow)](#)
+[![AMD Slingshot](https://img.shields.io/badge/AMD_Slingshot-Hackathon_2026-black)](https://www.amd.com/en)
+[![Theme](https://img.shields.io/badge/Theme-Smart_Cities-blue)](https://www.amd.com/en/solutions/embedded/smart-cities.html)
+[![Hardware](https://img.shields.io/badge/Hardware-Kria_KV260-red)](https://www.amd.com/en/products/system-on-modules/kria/k26/kv260-vision-starter-kit.html)
+[![AI](https://img.shields.io/badge/AI-Explainable_ANFIS-purple)](https://en.wikipedia.org/wiki/Adaptive_neuro_fuzzy_inference_system)
+[![Status](https://img.shields.io/badge/Status-Simulated_&_Edge_Ready-brightgreen)](#)
 
 ## Introduction
 Traditional Electric Power Steering (EPS) systems rely on statically tuned PI controllers for "Active Return-to-Center". If a driver releases the steering wheel mid-curve, the static controller violently snaps the wheels back to a 0-degree default, causing dangerous swerves and high-speed rollovers. 
@@ -42,9 +42,45 @@ Our architecture splits the workload:
 ## Repository Structure
 ```text
 Edge-AI-Dynamic-EPS-Controller/
-├── dataset/         # Sensor telemetry dataset (CSV)
-├── src/             # PyTorch training script
+├── dataset/         # Sensor telemetry dataset (CSV) & formatting docs
+├── src/             # PyTorch training script & backend/frontend logic
 ├── models/          # Exported ONNX models (Opset 13)
-├── results/         # Training convergence graphs
-├── docs/            # Deep dive into approach
+├── results/         # Training convergence graphs & response analysis
+├── docs/            # Deep dive into approach & methodology
 └── README.md
+```
+## Model Results & Simulation
+The AI model successfully converged over 500 epochs, drastically reducing Mean Squared Error (MSE) while optimizing both Proportional ($Kp$) and Integral ($Ki$) gains simultaneously. Key Achievements Demonstrated in Simulation:
+
+- Damped Return-to-Center: Safely unwinds the steering wheel instead of snapping it back.
+
+- Pothole/Vibration Dampening: Dynamically drops PI gains in milliseconds when road vibration spikes to prevent violent wheel jerking.
+
+- Thermal Derating: Softens motor load during high-temperature scenarios.
+
+Detailed results, convergence graphs, and dynamic steering trajectory plots are available in the `results/` directory.
+
+## Edge Deployment & Future Scope
+
+The AI model has been fully trained, simulated, and exported to ONNX (Opset 13), making it strictly compatible with the AMD Vitis AI compiler. By sharing premise parameters (Gaussian fuzzy rules) across both outputs, the model effectively cuts NPU memory bandwidth requirements in half. The immediate future scope is physical deployment on the AMD Kria KV260 Vision AI Starter Kit, synthesizing the PI loop in Vitis HLS to achieve an industrial-grade, heterogeneous automotive ADAS application.
+
+# Contributors
+
+This project was developed by:
+
+* **[Mathivanan V](https://github.com/ramakrishna-example)** - Team Lead / Maintainer
+* **[Tatikonda Ramakrishna](https://github.com/mathivanan-example)** - Team member / Co-Maintainer
+* **[Kavya K](https://github.com/kavya-example)** - Team member / Co-Maintainer
+
+
+
+
+
+
+
+
+
+
+
+
+
