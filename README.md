@@ -3,11 +3,11 @@ An Edge-AI driven dynamic Electric Power Steering (EPS) controller using an expl
 
 # Edge-AI Dynamic EPS Controller for Automotive ADAS
 
-[![AMD Slingshot](https://img.shields.io/badge/AMD_Slingshot-Hackathon_2026-black)](https://www.amd.com/en)
+[![AMD Slingshot](https://img.shields.io/badge/AMD_Slingshot-Hackathon_2026-red)](https://www.amd.com/en)
 [![Theme](https://img.shields.io/badge/Theme-Smart_Cities-blue)](https://www.amd.com/en/solutions/embedded/smart-cities.html)
-[![Hardware](https://img.shields.io/badge/Hardware-Kria_KV260-red)](https://www.amd.com/en/products/system-on-modules/kria/k26/kv260-vision-starter-kit.html)
+[![Hardware](https://img.shields.io/badge/Hardware-Kria_KV260-green)](https://www.amd.com/en/products/system-on-modules/kria/k26/kv260-vision-starter-kit.html)
 [![AI](https://img.shields.io/badge/AI-Explainable_ANFIS-purple)](https://en.wikipedia.org/wiki/Adaptive_neuro_fuzzy_inference_system)
-[![Status](https://img.shields.io/badge/Status-Simulated_&_Edge_Ready-brightgreen)](#)
+[![Status](https://img.shields.io/badge/Status-Simulated_&_Edge_Ready-yellow)](#)
 
 ## Introduction
 Traditional Electric Power Steering (EPS) systems rely on statically tuned PI controllers for "Active Return-to-Center". If a driver releases the steering wheel mid-curve, the static controller violently snaps the wheels back to a 0-degree default, causing dangerous swerves and high-speed rollovers. 
@@ -68,9 +68,11 @@ The AI model has been fully trained, simulated, and exported to ONNX (Opset 13),
 
 This project was developed by:
 
-* **[Mathivanan V](https://github.com/ramakrishna-example)** - Team Lead / Maintainer
-* **[Tatikonda Ramakrishna](https://github.com/mathivanan-example)** - Team member / Co-Maintainer
-* **[Kavya K](https://github.com/kavya-example)** - Team member / Co-Maintainer
+* **[Mathivanan V](https://https://github.com/Mathivanan17)** - Team Lead / Maintainer
+* **[Tatikonda Ramakrishna](https://https://github.com/Techwithram)** - Team member / Co-Maintainer
+* **[Kavya K](https://github.com/kkavya)** - Team member / Co-Maintainer
+
+*Developed for the AMD Slingshot Hackathon 2026. Domain: Edge-AI • Automotive ADAS • Hardware-Software Co-Design*
 
 
 
