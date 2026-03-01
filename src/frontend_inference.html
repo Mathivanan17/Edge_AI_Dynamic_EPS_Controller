@@ -1,0 +1,379 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>AI Power Steering Digital Twin</title>
+    <style>
+      body {
+        margin: 0;
+        overflow: hidden;
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+        background-color: #0d1117;
+        color: #c9d1d9;
+      }
+      #canvas-container {
+        width: 100vw;
+        height: 100vh;
+        position: absolute;
+        top: 0;
+        left: 0;
+        z-index: 1;
+      }
+
+      /* The UI Dashboard */
+      #dashboard {
+        position: absolute;
+        bottom: 20px;
+        left: 20px;
+        z-index: 10;
+        background: rgba(22, 27, 34, 0.85);
+        padding: 20px;
+        border-radius: 12px;
+        border: 1px solid #30363d;
+        width: 350px;
+        backdrop-filter: blur(10px);
+      }
+      h2 {
+        margin-top: 0;
+        font-size: 18px;
+        color: #58a6ff;
+        border-bottom: 1px solid #30363d;
+        padding-bottom: 10px;
+      }
+
+      .control-group {
+        margin-bottom: 15px;
+      }
+      label {
+        display: flex;
+        justify-content: space-between;
+        font-size: 13px;
+        font-weight: bold;
+        margin-bottom: 5px;
+      }
+      input[type="range"] {
+        width: 100%;
+        cursor: pointer;
+      }
+
+      .telemetry-box {
+        background: #0d1117;
+        padding: 10px;
+        border-radius: 8px;
+        margin-top: 15px;
+        border: 1px solid #30363d;
+      }
+      .data-row {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 5px;
+        font-family: monospace;
+        font-size: 14px;
+      }
+      .highlight {
+        color: #3fb950;
+        font-weight: bold;
+        font-size: 16px;
+      }
+      .warning {
+        color: #f85149;
+        font-weight: bold;
+      }
+
+      #connection-status {
+        position: absolute;
+        top: 20px;
+        left: 20px;
+        z-index: 10;
+        padding: 8px 12px;
+        border-radius: 20px;
+        font-size: 12px;
+        font-weight: bold;
+        background: #8b0000;
+        color: white;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="connection-status">🔴 AI Backend Disconnected</div>
+
+    <div id="canvas-container"></div>
+
+    <div id="dashboard">
+      <h2>⚡ EV Power Steering AI Twin</h2>
+
+      <div class="control-group">
+        <label
+          >Driver Steering Input
+          <span><span id="target-val">0</span>°</span></label
+        >
+        <input type="range" id="steering-slider" min="-45" max="45" value="0" />
+      </div>
+
+      <div class="control-group">
+        <label
+          >Road Vibration (G-Force)
+          <span id="vib-val" class="warning">0.5 G</span></label
+        >
+        <input
+          type="range"
+          id="vib-slider"
+          min="0.1"
+          max="4.5"
+          step="0.1"
+          value="0.5"
+        />
+      </div>
+      <div class="control-group">
+        <label
+          >EPS Motor Temp (°C)
+          <span id="temp-val" class="warning">35 °C</span></label
+        >
+        <input type="range" id="temp-slider" min="20" max="110" value="35" />
+      </div>
+      <div style="margin-top: 15px">
+        <label style="color: #3fb950">Live XAI Rule Engine</label>
+        <div
+          id="xai-terminal"
+          style="
+            background: #000;
+            color: #0f0;
+            font-family: monospace;
+            font-size: 11px;
+            padding: 10px;
+            height: 100px;
+            overflow-y: hidden;
+            border-radius: 6px;
+            border: 1px solid #3fb950;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+          "
+        >
+          <div
+            id="xai-content"
+            style="display: flex; flex-direction: column; gap: 4px"
+          >
+            Waiting for AI telemetry...
+          </div>
+        </div>
+      </div>
+      <div class="telemetry-box">
+        <div class="data-row">
+          <span>Actual Wheel Angle:</span> <span id="actual-angle">0.00°</span>
+        </div>
+        <div class="data-row">
+          <span>Optimal Kp:</span>
+          <span id="kp-display" class="highlight">0.000</span>
+        </div>
+        <div class="data-row">
+          <span>Optimal Ki:</span>
+          <span id="ki-display" class="highlight">0.000</span>
+        </div>
+      </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+
+    <script>
+      // ==========================================
+      // 1. THREE.JS 3D ENVIRONMENT SETUP
+      // ==========================================
+      const scene = new THREE.Scene();
+      const camera = new THREE.PerspectiveCamera(
+        45,
+        window.innerWidth / window.innerHeight,
+        0.1,
+        100,
+      );
+      camera.position.set(0, 3, 7);
+
+      const renderer = new THREE.WebGLRenderer({
+        antialias: true,
+        alpha: true,
+      });
+      renderer.setSize(window.innerWidth, window.innerHeight);
+      document
+        .getElementById("canvas-container")
+        .appendChild(renderer.domElement);
+
+      const controls = new THREE.OrbitControls(camera, renderer.domElement);
+      controls.enableDamping = true;
+
+      // Lighting
+      const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
+      scene.add(ambientLight);
+      const dirLight = new THREE.DirectionalLight(0xffffff, 0.8);
+      dirLight.position.set(5, 10, 5);
+      scene.add(dirLight);
+
+      // Load 3D Car Model
+      let carModel;
+      const loader = new THREE.GLTFLoader();
+      // NOTE: Ensure your 3D file is named 'car.glb' and is in the same folder!
+      loader.load(
+        "car.glb",
+        function (gltf) {
+          carModel = gltf.scene;
+          carModel.position.set(0, -1, 0);
+          scene.add(carModel);
+        },
+        undefined,
+        function (error) {
+          console.error(
+            "Could not load car.glb. Make sure the file exists!",
+            error,
+          );
+        },
+      );
+
+      // ==========================================
+      // 2. WEBSOCKET TO PYTHON AI BACKEND
+      // ==========================================
+      let ai_kp = 0.0;
+      let ai_ki = 0.0;
+      let isConnected = false;
+
+      const ws = new WebSocket("ws://localhost:8000/ws/telemetry");
+
+      ws.onopen = () => {
+        document.getElementById("connection-status").innerText =
+          "🟢 AI NPU Connected";
+        document.getElementById("connection-status").style.background =
+          "#238636";
+        isConnected = true;
+      };
+
+      // ws.onmessage = (event) => {
+      //   const data = JSON.parse(event.data);
+      //   ai_kp = data.kp;
+      //   ai_ki = data.ki;
+
+      //   // Update UI Gauges
+      //   document.getElementById("kp-display").innerText = ai_kp.toFixed(4);
+      //   document.getElementById("ki-display").innerText = ai_ki.toFixed(4);
+
+      //   // Update Live Explainability Terminal (throttle updates to make it readable)
+      //   if (Math.random() > 0.8) {
+      //     // Only print 20% of the messages so it doesn't blur past the judges
+      //     const terminal = document.getElementById("xai-content");
+      //     const newLog = document.createElement("div");
+      //     newLog.innerText = `> Kp:${ai_kp.toFixed(2)} | ${data.explanation}`;
+      //     terminal.appendChild(newLog);
+
+      //     // Keep only the last 4 messages in the terminal
+      //     if (terminal.childNodes.length > 4) {
+      //       terminal.removeChild(terminal.firstChild);
+      //     }
+      //   }
+      // };
+
+      ws.onmessage = (event) => {
+        const data = JSON.parse(event.data);
+        ai_kp = data.kp;
+        ai_ki = data.ki;
+
+        // Update UI Gauges
+        document.getElementById("kp-display").innerText = ai_kp.toFixed(4);
+        document.getElementById("ki-display").innerText = ai_ki.toFixed(4);
+
+        // Update Live Explainability Terminal
+        if (Math.random() > 0.8) {
+          const terminal = document.getElementById("xai-content");
+          const newLog = document.createElement("div");
+
+          // 🚨 FIX: Now printing BOTH Kp and Ki to the terminal!
+          newLog.innerText = `> Kp:${ai_kp.toFixed(2)} | Ki:${ai_ki.toFixed(2)} | ${data.explanation}`;
+
+          terminal.appendChild(newLog);
+
+          if (terminal.childNodes.length > 4) {
+            terminal.removeChild(terminal.firstChild);
+          }
+        }
+      };
+      ws.onclose = () => {
+        document.getElementById("connection-status").innerText =
+          "🔴 AI Backend Disconnected";
+        document.getElementById("connection-status").style.background =
+          "#8b0000";
+        isConnected = false;
+      };
+
+      // ==========================================
+      // 3. PHYSICAL STEERING SIMULATION LOOP
+      // ==========================================
+      let actual_wheel_angle = 0.0;
+      let integral_error = 0.0;
+
+      // UI Elements
+      const steerSlider = document.getElementById("steering-slider");
+      const vibSlider = document.getElementById("vib-slider");
+      const tempSlider = document.getElementById("temp-slider");
+
+      // Update UI Text as sliders move
+      steerSlider.oninput = () =>
+        (document.getElementById("target-val").innerText = steerSlider.value);
+      vibSlider.oninput = () =>
+        (document.getElementById("vib-val").innerText = vibSlider.value + " G");
+      tempSlider.oninput = () =>
+        (document.getElementById("temp-val").innerText =
+          tempSlider.value + " °C");
+
+      function simulationLoop() {
+        requestAnimationFrame(simulationLoop);
+        controls.update();
+
+        let target_angle = parseFloat(steerSlider.value);
+
+        // Calculate Steering Error
+        let error = target_angle - actual_wheel_angle;
+
+        // Normalize error for the AI (-1.0 to 1.0 based on max 45 degree turn)
+        let norm_error = error / 45.0;
+
+        // Send Telemetry to AI Backend at 60Hz
+        if (isConnected && ws.readyState === WebSocket.OPEN) {
+          const telemetry = {
+            steering_error: norm_error,
+            pwm_saturation: Math.min(Math.abs(norm_error) * 2.0, 1.0), // Rough PWM estimate
+            road_vibration: parseFloat(vibSlider.value),
+            eps_temperature: parseFloat(tempSlider.value),
+          };
+          ws.send(JSON.stringify(telemetry));
+        }
+
+        // Apply PI Controller Physics to the wheels
+        integral_error += error * 0.016; // 0.016s is approx 60fps delta time
+        let motor_output = ai_kp * error + ai_ki * integral_error;
+
+        // Move the actual wheel angle based on motor power
+        actual_wheel_angle += motor_output * 0.5; // 0.5 is a simulated physical inertia constant
+
+        document.getElementById("actual-angle").innerText =
+          actual_wheel_angle.toFixed(2) + "°";
+
+        // Visually rotate the whole car (or specific meshes if you find the wheel nodes)
+        if (carModel) {
+          // For a simple demo, we rotate the whole chassis slightly to simulate steering
+          // To rotate ONLY the front wheels, you'd need to find them: carModel.getObjectByName('FrontLeftWheel').rotation.y = ...
+          carModel.rotation.y = -actual_wheel_angle * (Math.PI / 180) * 0.5;
+        }
+
+        renderer.render(scene, camera);
+      }
+
+      // Start Loop
+      simulationLoop();
+
+      // Handle Window Resize
+      window.addEventListener("resize", () => {
+        camera.aspect = window.innerWidth / window.innerHeight;
+        camera.updateProjectionMatrix();
+        renderer.setSize(window.innerWidth, window.innerHeight);
+      });
+    </script>
+  </body>
+</html>
